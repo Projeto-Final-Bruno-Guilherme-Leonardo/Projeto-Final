@@ -1,6 +1,6 @@
 """
 Jogo Jetpack
-Autores: Bruno Conte, Guilherme Arraes, Leonardo Alvarez
+Autores: Bruno Conte, Guilherme Aranha, Leonardo Alvarez
 """
 
 import pygame
