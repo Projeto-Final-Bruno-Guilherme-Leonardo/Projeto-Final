@@ -16,12 +16,17 @@ surf = pygame.display.set_mode([surf_largura, surf_altura]) # crição da superf
 
 coisa_imagens = []
 
+v = 10
+
 try:
     imagem_jetpack = pygame.image.load('imagens/jetpack.png').convert_alpha()
     imagem_jetpack = pygame.transform.scale(imagem_jetpack, (100, 100))
     
     coisa_imagens.append(pygame.image.load('imagens/pedra.png').convert_alpha())
     coisa_imagens[-1] = pygame.transform.scale(coisa_imagens[-1], (50, 50))
+    
+    coisa_imagens.append(pygame.image.load('imagens/laser.png').convert_alpha())
+    coisa_imagens[-1] = pygame.transform.scale(coisa_imagens[-1], (100, 100))
     
 except pygame.error:
     print('Erro ao tentar ler uma imagem')
@@ -53,7 +58,16 @@ class Coisa(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         
-        self.image = coisa_imagens[random.randint(0, len(coisa_imagens))]
+        self.image = coisa_imagens[random.randint(0, len(coisa_imagens) -1)]
+        self.rect = self.image.get_rect()
+        self.rect.left = surf_largura
+        self.rect.y = random.randint(0, surf_altura - self.rect.height)
+        
+    def update(self):
+        self.rect.x -= v
+        if self.rect.right < 0:
+            self.kill()
+        
         
     
 
@@ -67,10 +81,18 @@ def main():
     
     clock = pygame.time.Clock()
     FPS = 30
+    
+    timer = 0
 
     # Game Loop
     while True:
         clock.tick(FPS)
+        timer += 1
+        
+        if timer == 100:
+            timer = 0
+            coisa = Coisa()
+            sprites.add(coisa)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
