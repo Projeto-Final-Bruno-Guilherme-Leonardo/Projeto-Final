@@ -5,50 +5,95 @@ Autores: Bruno Conte, Guilherme Aranha, Leonardo Alvarez
 
 import pygame
 import sys
-import os
 
 CINZA = (127, 127, 127)
 
+surf_altura = 500
+surf_largura = 700
+
+pygame.init() # inicia o pygame
+
+surf = pygame.display.set_mode([surf_largura, surf_altura]) # crição da superfície para o jogo (local para desenhar) # entre parenteses o tamanho da tela
+
+try:
+    imagem_jetpack = pygame.image.load('imagens/jetpack.png').convert_alpha()
+    imagem_jetpack = pygame.transform.scale(imagem_jetpack, (100, 100))
+except pygame.error:
+    print('Erro ao tentar ler imagem: jetpack.png')
+    sys.exit()
+    
+
+class Jetpack(pygame.sprite.Sprite):
+    
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        
+        self.image = imagem_jetpack
+        self.rect = self.image.get_rect()
+        self.rect.centerx = 100
+        self.rect.centery = 100
+        self.speed = 0
+        self.a = 0
+        
+    def update(self):
+        self.speed += self.a
+        self.rect.y += 1 * self.speed
+        if self.rect.top + (1 * self.speed) < 0:
+            self.rect.top = 0
+            self.speed = 0
+        if self.rect.bottom + (1 * self.speed) > surf_altura:
+            self.rect.bottom = surf_altura
+            self.speed = 0
+        
+    
+
+
+jetpack = Jetpack()
+
+sprites = pygame.sprite.Group()
+sprites.add(jetpack)
+
 def main():
     """Rotina principal do jogo"""
-
-    pygame.init() # inicia o pygame
-
-    surf = pygame.display.set_mode([400, 400]) # crição da superfície para o jogo (local para desenhar) # entre parenteses o tamanho da tela
-
-    arquivo = os.path.join('imagens', 'personagem.png') # pega a imagem da pasta
-
-    try:
-        imagem = pygame.image.load(arquivo)
-    except pygame.error:
-        print('Erro ao tentar ler imagem: imagem.png')
-        sys.exit()
-
-    posicao = 0
-
-    clock = pygame.time.Clock() # objeto para controle das atualizações de imagens
+    
+    clock = pygame.time.Clock()
+    FPS = 30
 
     # Game Loop
     while True:
-        delta_time = clock.tick(60) # garante um fps máximo de 60Hz
+        clock.tick(FPS)
 
-        eventos = pygame.event.get()
-
-        for evento in eventos:
-            if evento.type == pygame.QUIT:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
                 pygame.quit() # terminado a aplicação pygame
                 sys.exit() # sai pela rotima do sistema
+                
+            if event.type == pygame.KEYDOWN:
+            # Dependendo da tecla, altera a velocidade.
+                if event.key == pygame.K_SPACE:
+                    jetpack.a = -1
+                    print('A')
+        # Verifica se soltou alguma tecla.
+            if event.type == pygame.KEYUP:
+            # Dependendo da tecla, altera a velocidade.
+                if event.key == pygame.K_SPACE:
+                    jetpack.a = 1
+                    print('B')
+                    
+        sprites.update()
         
         surf.fill(CINZA) # preenche a tela
         #cores variam de 0 a 255 > 0 = preto
-
-        posicao += 0.2 * delta_time
-
-        surf.blit(imagem, [posicao, 0]) # eixos x e y dentro dos []
-
-        pygame.draw.circle(surf, [0, 0, 255], [200,200], 50) # desenha o circulo
+        sprites.draw(surf)
 
         pygame.display.flip() # faz a atualizacao da tela
 
 if __name__ == "__main__":
     main()
+
+
+
+
+
+
+
