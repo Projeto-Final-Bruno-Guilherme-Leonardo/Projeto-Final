@@ -7,6 +7,10 @@ import pygame
 import sys
 import random
 
+pygame.init() # inicia o pygame
+
+font = pygame.font.SysFont(None, 48)
+
 surf_altura = 600
 surf_largura = int(surf_altura * 1.5)
 
@@ -19,13 +23,12 @@ def proporcao(a, b = 0):
 a_cima = -0.3
 a_baixo = 0.25
 
-pygame.init() # inicia o pygame
-
 surf = pygame.display.set_mode([surf_largura, surf_altura]) # crição da superfície para o jogo (local para desenhar) # entre parenteses o tamanho da tela
 
 coisa_imagens = []
 
 game = 0    #o jogo começa desligado, no menu
+corrido = 0
 
 v_inicial = 2
 v = v_inicial  #velocida dos obstaculos
@@ -107,6 +110,7 @@ jetpack = Jetpack(sprites)
 def main():
     global game
     global v
+    global corrido
     
     clock = pygame.time.Clock()
     FPS = 30
@@ -142,10 +146,14 @@ def main():
                 coisas.add(coisa)
                 
             v += 0.001   #almenta a velocidade dos obstaculos constantemente
+            corrido += v * 0.1
+            corredor = font.render(str(int(corrido)) + ' metros', True, (200, 200, 0))
+            
                 
             surf.fill((255, 255, 255)) # preenche a tela
             #cores variam de 0 a 255 > 0 = preto
             sprites.draw(surf)
+            surf.blit(corredor, (10, 10))
             
             sprites.update()
                 
