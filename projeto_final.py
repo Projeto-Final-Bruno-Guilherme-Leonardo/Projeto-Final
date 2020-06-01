@@ -10,8 +10,14 @@ import random
 surf_altura = 600
 surf_largura = int(surf_altura * 1.5)
 
-a_cima = -3
-a_baixo = 2.25
+def proporcao(a, b = 0):
+    if b == 0:
+        return a * surf_altura / 100
+    else:
+        return (int(a * surf_altura / 100), int(b * surf_altura / 100))
+
+a_cima = -0.3
+a_baixo = 0.25
 
 pygame.init() # inicia o pygame
 
@@ -21,21 +27,18 @@ coisa_imagens = []
 
 game = 0    #o jogo começa desligado, no menu
 
-v_inicial = 10
+v_inicial = 2
 v = v_inicial  #velocida dos obstaculos
-
-def proporcao(a, b):
-    return (int(a * surf_altura / 100), int(b * surf_altura / 100))
 
 try:
     imagem_jetpack = pygame.image.load('imagens/jetpack.png').convert_alpha()
     imagem_jetpack = pygame.transform.scale(imagem_jetpack, proporcao(10, 10))
     
     coisa_imagens.append(pygame.image.load('imagens/pedra.png').convert_alpha())
-    coisa_imagens[-1] = pygame.transform.scale(coisa_imagens[-1], proporcao(10, 10))
+    coisa_imagens[-1] = pygame.transform.scale(coisa_imagens[-1], proporcao(20, 20))
     
     coisa_imagens.append(pygame.image.load('imagens/laser.png').convert_alpha())
-    coisa_imagens[-1] = pygame.transform.scale(coisa_imagens[-1], proporcao(20, 20))
+    coisa_imagens[-1] = pygame.transform.scale(coisa_imagens[-1], proporcao(10, 10))
     
 except pygame.error:
     print('Erro ao tentar ler uma imagem')
@@ -48,14 +51,15 @@ class Jetpack(pygame.sprite.Sprite):
         
         self.image = imagem_jetpack
         self.rect = self.image.get_rect()
+        self.mask = pygame.mask.from_surface(self.image)
         self.rect.left = 100
         self.rect.bottom = surf_altura
         self.speed = 0  #velocidade vertical da jetpack
-        self.a = 1  #aceleracao
+        self.a = 0  #aceleracao
         
     def update(self):
         self.speed += self.a
-        self.rect.y += self.speed
+        self.rect.y += proporcao(self.speed)
         if self.rect.top + (1 * self.speed) < 0:
             self.rect.top = 0
             self.speed = 0
@@ -67,7 +71,7 @@ class Jetpack(pygame.sprite.Sprite):
         self.rect.left = 100
         self.rect.bottom = surf_altura
         self.speed = 0  #velocidade vertical da jetpack
-        self.a = 1  #aceleracao
+        self.a = 0  #aceleracao
         
             
 class Coisa(pygame.sprite.Sprite):
@@ -76,11 +80,18 @@ class Coisa(pygame.sprite.Sprite):
         
         self.image = coisa_imagens[random.randint(0, len(coisa_imagens) -1)]
         self.rect = self.image.get_rect()
+        self.mask = pygame.mask.from_surface(self.image)
         self.rect.left = surf_largura
-        self.rect.y = random.randint(0, surf_altura - self.rect.height)
+        if random.randint(0,4) == 0:
+            if random.randint(0,1) == 0:
+                self.rect.top = 0
+            else:
+                self.rect.bottom = surf_altura
+        else:
+            self.rect.y = random.randint(0, surf_altura - self.rect.height)
         
     def update(self):
-        self.rect.x -= v
+        self.rect.x -= proporcao(v)
         if self.rect.right < 0:
             self.kill()
         
@@ -101,6 +112,7 @@ def main():
     FPS = 30
     
     timer = 0
+    t_obstaculo = 50
 
     # Game Loop
     while True:
@@ -123,12 +135,13 @@ def main():
         
         if game:    #se o jogo estiver ligado:  
             timer += 1
-            if timer == 30:
+            if timer == t_obstaculo: #Timer para crias obstaculos
                 timer = 0
+                t_obstaculo = random.randint(10, 50)
                 coisa = Coisa(sprites)
                 coisas.add(coisa)
                 
-            v += 0.01   #almenta a velocidade dos obstaculos constantemente
+            v += 0.001   #almenta a velocidade dos obstaculos constantemente
                 
             surf.fill((255, 255, 255)) # preenche a tela
             #cores variam de 0 a 255 > 0 = preto
@@ -136,9 +149,10 @@ def main():
             
             sprites.update()
                 
-            if pygame.sprite.spritecollide(jetpack, coisas, 0):
+            if pygame.sprite.spritecollide(jetpack, coisas, False, pygame.sprite.collide_mask):
                 game = 0
                 v = v_inicial
+                t_obstaculo = 50
                 for i in coisas:
                     i.kill()
                 jetpack.reset()
@@ -150,7 +164,6 @@ def main():
 
         
         pygame.display.flip() # faz a atualizacao da tela
-
 
 main()
 
