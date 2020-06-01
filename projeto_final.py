@@ -10,6 +10,9 @@ import random
 surf_altura = 600
 surf_largura = int(surf_altura * 1.5)
 
+a_cima = -3
+a_baixo = 2.25
+
 pygame.init() # inicia o pygame
 
 surf = pygame.display.set_mode([surf_largura, surf_altura]) # crição da superfície para o jogo (local para desenhar) # entre parenteses o tamanho da tela
@@ -18,7 +21,8 @@ coisa_imagens = []
 
 game = 0    #o jogo começa desligado, no menu
 
-v = 10  #velocida dos obstaculos
+v_inicial = 10
+v = v_inicial  #velocida dos obstaculos
 
 def proporcao(a, b):
     return (int(a * surf_altura / 100), int(b * surf_altura / 100))
@@ -28,10 +32,10 @@ try:
     imagem_jetpack = pygame.transform.scale(imagem_jetpack, proporcao(10, 10))
     
     coisa_imagens.append(pygame.image.load('imagens/pedra.png').convert_alpha())
-    coisa_imagens[-1] = pygame.transform.scale(coisa_imagens[-1], proporcao(50, 50))
+    coisa_imagens[-1] = pygame.transform.scale(coisa_imagens[-1], proporcao(10, 10))
     
     coisa_imagens.append(pygame.image.load('imagens/laser.png').convert_alpha())
-    coisa_imagens[-1] = pygame.transform.scale(coisa_imagens[-1], proporcao(50, 50))
+    coisa_imagens[-1] = pygame.transform.scale(coisa_imagens[-1], proporcao(20, 20))
     
 except pygame.error:
     print('Erro ao tentar ler uma imagem')
@@ -50,7 +54,7 @@ class Jetpack(pygame.sprite.Sprite):
         self.a = 1  #aceleracao
         
     def update(self):
-        self.speed += self.a * 2
+        self.speed += self.a
         self.rect.y += self.speed
         if self.rect.top + (1 * self.speed) < 0:
             self.rect.top = 0
@@ -91,6 +95,7 @@ jetpack = Jetpack(sprites)
 
 def main():
     global game
+    global v
     
     clock = pygame.time.Clock()
     FPS = 30
@@ -108,40 +113,43 @@ def main():
                 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    jetpack.a = -1
+                    jetpack.a = a_cima
                 if event.key == pygame.K_RETURN and game == 0:
                     game = 1
                     
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_SPACE:
-                    jetpack.a = 1
+                    jetpack.a = a_baixo
         
-        if game:    #se o jogo estiver ligado:
-            
+        if game:    #se o jogo estiver ligado:  
             timer += 1
-            if timer == 100:
+            if timer == 30:
                 timer = 0
                 coisa = Coisa(sprites)
                 coisas.add(coisa)
-                print('criando coisa')
-                        
-            sprites.update()
-            
+                
+            v += 0.01   #almenta a velocidade dos obstaculos constantemente
+                
             surf.fill((255, 255, 255)) # preenche a tela
             #cores variam de 0 a 255 > 0 = preto
             sprites.draw(surf)
+            
+            sprites.update()
+                
+            if pygame.sprite.spritecollide(jetpack, coisas, 0):
+                game = 0
+                v = v_inicial
+                for i in coisas:
+                    i.kill()
+                jetpack.reset()
+                surf.fill((55, 55, 55)) # preenche a tela
+            
+        else:   #se o jogo estiver desligado, no menu
+            
+            surf.fill((55, 55, 55)) # preenche a tela
 
+        
         pygame.display.flip() # faz a atualizacao da tela
-
-        if pygame.sprite.spritecollide(jetpack, coisas, 0):
-            game = 0
-            for i in coisas:
-                i.kill()
-            jetpack.reset()
-
-        print('a')
-        print(sprites)
-
 
 
 main()
