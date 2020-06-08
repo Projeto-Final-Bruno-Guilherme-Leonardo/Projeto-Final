@@ -36,14 +36,14 @@ v_inicial = 2
 v = v_inicial  #velocida dos obstaculos
 
 try:
-    imagem_menu = pygame.image.load('imagens/menu.png').convert_alpha()
+    imagem_menu = pygame.image.load('imagens/menu.png').convert()
     imagem_menu = pygame.transform.scale(imagem_menu, (surf_largura, surf_altura))
     
-    imagem_chao = pygame.image.load('imagens/chao.png').convert_alpha()
+    imagem_chao = pygame.image.load('imagens/chao.png').convert()
     imagem_chao = pygame.transform.scale(imagem_chao, proporcao(375, 30))
     imagem_teto = pygame.transform.rotate(imagem_chao, 180)
     
-    imagem_fundo = pygame.image.load('imagens/fundo.png').convert_alpha()
+    imagem_fundo = pygame.image.load('imagens/fundo.png').convert()
     imagem_fundo = pygame.transform.scale(imagem_fundo, proporcao(375, 125))
     
     imagem_jetpack = pygame.image.load('imagens/jetpack.png').convert_alpha()
@@ -148,7 +148,7 @@ fundo.rect.centery = proporcao(50, 'borda')
 
 
 clock = pygame.time.Clock()
-FPS = 60
+FPS = 30
 
 timer = 0
 t_obstaculo = 50
