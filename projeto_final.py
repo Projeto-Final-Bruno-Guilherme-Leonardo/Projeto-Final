@@ -3,18 +3,18 @@ Jogo Jetpack
 Autores: Bruno Conte, Guilherme Aranha, Leonardo Alvarez
 """
 
-import pygame
+import pygame    #importa todos os modulos que serao usados
 import sys
 import random
 
-pygame.init() # inicia o pygame
+pygame.init()    #inicia o pygame
 
 font = pygame.font.SysFont(None, 48)
 
-surf_altura = 900
+surf_altura = 900   #<-----------| altura da tela, recomendado: 900 |
 surf_largura = int(surf_altura * 1.5)
 
-def proporcao(a, b = 0):
+def proporcao(a, b = 0):    #funcao que mantem a proporcao entre as sprites e o tamanho da tela
     if b == 0:
         return a * surf_altura / 100
     elif b == 'borda':
@@ -25,12 +25,12 @@ def proporcao(a, b = 0):
 a_cima = -0.3
 a_baixo = 0.25
 
-surf = pygame.display.set_mode([surf_largura, surf_altura]) # crição da superfície para o jogo (local para desenhar) # entre parenteses o tamanho da tela
+surf = pygame.display.set_mode([surf_largura, surf_altura]) #cria a janela
 
 coisa_imagens = []
 
-game = 0    #o jogo começa desligado, no menu
-corrido = 0
+game = 0    #o jogo começa desligado, ou seja, no menu
+corrido = 0     #o caminho corrido comeca no 0
 
 v_inicial = 2
 v = v_inicial  #velocida dos obstaculos
@@ -56,14 +56,19 @@ except pygame.error:
     print('Erro ao tentar ler uma imagem')
     sys.exit()
 
-class Cenario(pygame.sprite.Sprite):
+class Cenario(pygame.sprite.Sprite):    #sprite que serve como cenario
     def __init__(self, grupo, imagem):
         super().__init__(grupo)
         
         self.image = imagem
         self.rect = self.image.get_rect()
+    
+    def update(self):
+        self.rect.x -= proporcao(v)
+        if self.rect.right < 0:
+            self.kill()
 
-class Jetpack(pygame.sprite.Sprite):
+class Jetpack(pygame.sprite.Sprite):    #sprite que mostra o player
     def __init__(self, grupo):
         super().__init__(grupo)
         
@@ -91,7 +96,7 @@ class Jetpack(pygame.sprite.Sprite):
         self.a = 0  #aceleracao
         
             
-class Coisa(pygame.sprite.Sprite):
+class Coisa(pygame.sprite.Sprite):      #sprite que serve como obstaculo
     def __init__(self, grupo):
         super().__init__(grupo)
         
@@ -100,7 +105,6 @@ class Coisa(pygame.sprite.Sprite):
         self.mask = pygame.mask.from_surface(self.image)
         self.rect.left = surf_largura
         if random.randint(0,4) == 0:
-            print('aaa')
             if random.randint(0,1) == 0:
                 self.rect.top = proporcao(0, 'borda')
             else:
@@ -191,7 +195,7 @@ def main():
                 jetpack.reset()
                 surf.fill((55, 55, 55)) # preenche a tela
             
-        else:   #se o jogo estiver desligado, no menu
+        else:   #se o jogo estiver desligado, ou seja, no menu
             
             surf.fill((55, 55, 55)) # preenche a tela
 
