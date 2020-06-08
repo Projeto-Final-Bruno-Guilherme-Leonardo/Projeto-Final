@@ -22,8 +22,8 @@ def proporcao(a, b = 0):    #funcao que mantem a proporcao entre as sprites e o 
     else:
         return (int(a * surf_altura * 0.8 / 100), int(b * surf_altura * 0.8 / 100))
 
-a_cima = -0.3
-a_baixo = 0.25
+a_cima = -0.15  #aceleracao vertical quando aperta ESPAÇO
+a_baixo = 0.12  #aceleracao vertical quando solta
 
 surf = pygame.display.set_mode([surf_largura, surf_altura]) #cria a janela
 
@@ -32,7 +32,7 @@ coisa_imagens = []
 game = 0    #o jogo começa desligado, ou seja, no menu
 corrido = 0     #o caminho corrido comeca no 0
 
-v_inicial = 2
+v_inicial = 1
 v = v_inicial  #velocida dos obstaculos
 
 try:
@@ -70,7 +70,7 @@ class Cenario(pygame.sprite.Sprite):    #sprite que serve como cenario
         self.rect = self.image.get_rect()
     
     def update(self):
-        self.rect.x -= proporcao(v)
+        self.rect.x -= int(proporcao(v))
         if self.rect.centerx < 0:
             self.rect.centerx = surf_largura
             
@@ -120,7 +120,7 @@ class Coisa(pygame.sprite.Sprite):      #sprite que serve como obstaculo
             self.rect.y = random.randint(proporcao(0, 'borda'), proporcao(100, 'borda') - self.rect.height)
         
     def update(self):
-        self.rect.x -= proporcao(v)
+        self.rect.x -= int(proporcao(v))
         if self.rect.right < 0:
             self.kill()
         
@@ -148,10 +148,10 @@ fundo.rect.centery = proporcao(50, 'borda')
 
 
 clock = pygame.time.Clock()
-FPS = 30
+FPS = 60
 
 timer = 0
-t_obstaculo = 50
+t_obstaculo = 100
 
 while True:     #loop principal da interface
     clock.tick(FPS)
@@ -175,12 +175,12 @@ while True:     #loop principal da interface
         timer += 1
         if timer == t_obstaculo: #Timer para criar obstaculos
             timer = 0
-            t_obstaculo = random.randint(10, 50)
+            t_obstaculo = random.randint(20, 100)
             coisa = Coisa(sprites)
             coisas.add(coisa)
             
         v += 0.001   #aumenta a velocidade dos obstaculos constantemente
-        corrido += v * 0.1
+        corrido += v * 0.05
         corredor = font.render(str(int(corrido)) + ' metros', True, (200, 200, 0))     
             
         surf.fill((255, 255, 255)) # preenche a tela
@@ -193,6 +193,13 @@ while True:     #loop principal da interface
         sprites.update()
         fundos.update()
         paredes.update()
+        
+#        for i in sprites:
+#            print('sprite: ' + str(i.rect.left))
+#        for i in fundos:
+#            print('fundos: ' + str(i.rect.left))
+#        print('v: ' + str(v))
+            
             
         if pygame.sprite.spritecollide(jetpack, coisas, False, pygame.sprite.collide_mask):
             game = 0
