@@ -55,6 +55,9 @@ try:
     coisa_imagens.append(pygame.image.load('imagens/laser.png').convert_alpha())
     coisa_imagens[-1] = pygame.transform.scale(coisa_imagens[-1], proporcao(30, 30))
     
+    coisa_imagens.append(pygame.image.load('imagens/spike.png').convert_alpha())
+    coisa_imagens[-1] = pygame.transform.scale(coisa_imagens[-1], proporcao(10, 10))
+    
 except pygame.error:
     print('Erro ao tentar ler uma imagem')
     sys.exit()
@@ -145,7 +148,7 @@ fundo.rect.centery = proporcao(50, 'borda')
 
 
 clock = pygame.time.Clock()
-FPS = 30
+FPS = 60
 
 timer = 0
 t_obstaculo = 50
@@ -205,7 +208,7 @@ while True:     #loop principal da interface
         
     else:   #se o jogo estiver desligado, ou seja, no menu
         
-        surf.blit(imagem_menu, (0, 0)) # preenche a tela
+        surf.blit(imagem_menu, (0, 0)) #apresenta o Menu
 
     
     pygame.display.flip() # faz a atualizacao da tela
