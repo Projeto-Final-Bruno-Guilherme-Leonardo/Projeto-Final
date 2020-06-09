@@ -11,7 +11,7 @@ pygame.init()    #inicia o pygame
 
 font = pygame.font.SysFont(None, 48)
 
-surf_altura = 900   #<-----------| altura da tela, recomendado: 900 |
+surf_altura = 300   #<-----------| altura da tela, recomendado: 900 |
 surf_largura = int(surf_altura * 1.5)
 
 def proporcao(a, b = 0):    #funcao que mantem a proporcao entre as sprites e o tamanho da tela
@@ -34,6 +34,8 @@ corrido = 0     #o caminho corrido comeca no 0
 
 v_inicial = 1
 v = v_inicial  #velocida dos obstaculos
+
+score = []
 
 try:
     imagem_menu = pygame.image.load('imagens/menu.png').convert()
@@ -63,14 +65,15 @@ except pygame.error:
     sys.exit()
 
 class Cenario(pygame.sprite.Sprite):    #sprite que serve como cenario
-    def __init__(self, grupo, imagem):
+    def __init__(self, grupo, imagem, paralaxe = 0):
         super().__init__(grupo)
         
         self.image = imagem
         self.rect = self.image.get_rect()
+        self.paralaxe = paralaxe
     
     def update(self):
-        self.rect.x -= int(proporcao(v))
+        self.rect.x -= int(proporcao(v)) - (self.paralaxe * (2/3) * int(proporcao(v)))
         if self.rect.centerx < 0:
             self.rect.centerx = surf_largura
             
@@ -140,40 +143,40 @@ teto.rect.bottom = proporcao(0, 'borda')
 chao = Cenario(paredes, imagem_chao)
 chao.rect.left = proporcao(0)
 chao.rect.top = proporcao(100, 'borda')
-fundo = Cenario(fundos, imagem_fundo)
+fundo = Cenario(fundos, imagem_fundo, paralaxe = True)
 fundo.rect.left = proporcao(0)
 fundo.rect.centery = proporcao(50, 'borda')
 
 
 
 
-clock = pygame.time.Clock()
+clock = pygame.time.Clock()     #cria o FPS do jogo
 FPS = 60
 
-timer = 0
-t_obstaculo = 100
+timer = 0   #cria o timer para criar os obstaculos
+t_obstaculo = 100   #tempo ate aparecer o primeiro obstaculo
 
 while True:     #loop principal da interface
-    clock.tick(FPS)
+    clock.tick(FPS)     #garante o FPS predeterminado
     
-    for event in pygame.event.get():
+    for event in pygame.event.get():    #detecta os eventos do usuario
         if event.type == pygame.QUIT:
-            pygame.quit()   #fecha o pygame
-            sys.exit()      #fecha o sistema
+            pygame.quit()               #fecha o pygame
+            sys.exit()                   #fecha o sistema
             
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
-                jetpack.a = a_cima
+                jetpack.a = a_cima                          #acelera para cima 
             if event.key == pygame.K_RETURN and game == 0:
-                game = 1
+                game = 1                                    #inicia o jogo a partir do menu
                 
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_SPACE:
-                jetpack.a = a_baixo
+                jetpack.a = a_baixo                         #acelera para baixo
     
     if game:    #se o jogo estiver ligado:  
         timer += 1
-        if timer == t_obstaculo: #Timer para criar obstaculos
+        if timer >= t_obstaculo: #Timer para criar obstaculos
             timer = 0
             t_obstaculo = random.randint(20, 100)
             coisa = Coisa(sprites)
@@ -193,18 +196,15 @@ while True:     #loop principal da interface
         sprites.update()
         fundos.update()
         paredes.update()
-        
-#        for i in sprites:
-#            print('sprite: ' + str(i.rect.left))
-#        for i in fundos:
-#            print('fundos: ' + str(i.rect.left))
-#        print('v: ' + str(v))
-            
             
         if pygame.sprite.spritecollide(jetpack, coisas, False, pygame.sprite.collide_mask):
             game = 0
             v = v_inicial
             t_obstaculo = 50
+            score += [corrido]
+            score.sort(reverse = 1)
+            score = score[:5]
+            print(score)
             corrido = 0
             for i in coisas:
                 i.kill()
