@@ -9,9 +9,8 @@ import random
 
 pygame.init()    #inicia o pygame
 
-font = pygame.font.SysFont(None, 48)
 
-surf_altura = 300   #<-----------| altura da tela, recomendado: 900 |
+surf_altura = 400   #<-----------| altura da tela, recomendado: 900 |
 surf_largura = int(surf_altura * 1.5)
 
 def proporcao(a, b = 0):    #funcao que mantem a proporcao entre as sprites e o tamanho da tela
@@ -27,6 +26,8 @@ a_baixo = 0.12  #aceleracao vertical quando solta
 
 surf = pygame.display.set_mode([surf_largura, surf_altura]) #cria a janela
 
+font = pygame.font.SysFont(None, int(proporcao(6)))
+
 coisa_imagens = []
 
 game = 0    #o jogo começa desligado, ou seja, no menu
@@ -40,6 +41,12 @@ score = []
 try:
     imagem_menu = pygame.image.load('imagens/menu.png').convert()
     imagem_menu = pygame.transform.scale(imagem_menu, (surf_largura, surf_altura))
+    
+    imagem_scoreboardoff = pygame.image.load('imagens/scoreboardoff.png').convert()
+    imagem_scoreboardoff = pygame.transform.scale(imagem_scoreboardoff, proporcao(60, 60))
+    
+    imagem_scoreboardon = pygame.image.load('imagens/scoreboardon.png').convert()
+    imagem_scoreboardon = pygame.transform.scale(imagem_scoreboardon, proporcao(60, 60))
     
     imagem_chao = pygame.image.load('imagens/chao.png').convert()
     imagem_chao = pygame.transform.scale(imagem_chao, proporcao(375, 30))
@@ -184,7 +191,7 @@ while True:     #loop principal da interface
             
         v += 0.001   #aumenta a velocidade dos obstaculos constantemente
         corrido += v * 0.05
-        corredor = font.render(str(int(corrido)) + ' metros', True, (200, 200, 0))     
+        corredor = font.render(str(int(corrido)) + ' metros', True, (200, 200, 0))     #atualiza o contador da distancia percorrida
             
         surf.fill((255, 255, 255)) # preenche a tela
         #cores variam de 0 a 255 > 0 = preto
@@ -214,9 +221,17 @@ while True:     #loop principal da interface
             surf.fill((55, 55, 55)) # preenche a tela
         
     else:   #se o jogo estiver desligado, ou seja, no menu
-        
-        surf.blit(imagem_menu, (0, 0)) #apresenta o Menu
-
+#        score = [412, 1, 44, 2222, 2]
+        surf.blit(imagem_menu, (0, 0))      #apresenta o Menu
+        if len(score) == 0:
+            surf.blit(imagem_scoreboardoff, ((surf_largura/2) - (imagem_scoreboardoff.get_rect().size[0]/2), (surf_altura/2) - (imagem_scoreboardoff.get_rect().size[1]/2) + proporcao(20))) 
+        else:
+            surf.blit(imagem_scoreboardon, ((surf_largura/2) - (imagem_scoreboardoff.get_rect().size[0]/2), (surf_altura/2) - (imagem_scoreboardoff.get_rect().size[1]/2) + proporcao(20))) 
+            n = 0
+            for i in score:
+                texto = font.render(str(int(i)) + ' metros', True, (0, 170, 8))
+                surf.blit(texto, ((surf_largura/2) - (texto.get_rect().size[0]/2), (surf_altura/2) - (texto.get_rect().size[1]/2) + proporcao(6) + (proporcao(7)*n)))
+                n += 1
     
     pygame.display.flip() # faz a atualizacao da tela
 
