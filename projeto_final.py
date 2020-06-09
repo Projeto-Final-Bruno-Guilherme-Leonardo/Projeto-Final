@@ -11,7 +11,7 @@ import shelve
 pygame.init()    #inicia o pygame
 
 
-surf_altura = 900   #<-----------| altura da tela, recomendado: 900 |
+surf_altura = 1000   #<-----------| altura da tela, recomendado: 900 |
 surf_largura = int(surf_altura * 1.5)
 
 def proporcao(a, b = 0):    #funcao que mantem a proporcao entre as sprites e o tamanho da tela
@@ -30,6 +30,7 @@ surf = pygame.display.set_mode([surf_largura, surf_altura])     #cria a janela
 font = pygame.font.SysFont(None, int(proporcao(6)))             #cria a fonte para os textos
 fontScoreboard = pygame.font.SysFont(None, int(proporcao(8)))
 fontScoreboard2 = pygame.font.SysFont(None, int(proporcao(2)))
+fontAjuda = pygame.font.SysFont(None, int(proporcao(5)))
 
 verde = (0, 170, 8)
 
@@ -41,12 +42,22 @@ corrido = 0     #o caminho corrido comeca no 0
 v_inicial = 1
 v = v_inicial  #velocida dos obstaculos
 
+ajudax_inicial = proporcao(150)
+ajudax = ajudax_inicial
+
 arquivo_score = shelve.open('arquivo_score')
 try:
     score = arquivo_score['score']
 except:
     score = []
 arquivo_score.close()
+
+clock = pygame.time.Clock()     #cria o FPS do jogo
+FPS = 60
+
+timer = 0   #cria o timer para criar os obstaculos
+t_obstaculo_inicial = 100   #tempo ate aparecer o primeiro obstaculo
+t_obstaculo = t_obstaculo_inicial
 
 coisas_info = [
         ('pedra', 20),
@@ -75,6 +86,9 @@ try:
     
     imagem_corredor = pygame.image.load('imagens/corredor.png').convert()
     imagem_corredor = pygame.transform.scale(imagem_corredor, proporcao(40, 40))
+    
+    imagem_ajuda = pygame.image.load('imagens/ajuda.png').convert()
+    imagem_ajuda = pygame.transform.scale(imagem_ajuda, proporcao(100, 100))
     
     imagem_chao = pygame.image.load('imagens/chao.png').convert()
     imagem_chao = pygame.transform.scale(imagem_chao, proporcao(375, 30))
@@ -187,12 +201,6 @@ fundo.rect.centery = proporcao(50, 'borda')
 
 
 
-clock = pygame.time.Clock()     #cria o FPS do jogo
-FPS = 60
-
-timer = 0   #cria o timer para criar os obstaculos
-t_obstaculo = 100   #tempo ate aparecer o primeiro obstaculo
-
 while True:     #loop principal da interface
     clock.tick(FPS)     #garante o FPS predeterminado
     
@@ -228,6 +236,11 @@ while True:     #loop principal da interface
         surf.fill((255, 255, 255)) # preenche a tela
         #cores variam de 0 a 255 > 0 = preto
         fundos.draw(surf)
+        if ajudax > 0:
+            surf.blit(imagem_ajuda, (ajudax - imagem_ajuda.get_rect().size[0], (surf_altura/2) - (imagem_ajuda.get_rect().size[1]/2)))
+            ajudax -= proporcao(v) * (1/2)
+            textoAjuda = fontAjuda.render('Aperte [ESPAÇO] para voar', True, verde)
+            surf.blit(textoAjuda, (ajudax - (imagem_ajuda.get_rect().size[0]/2) - (textoAjuda.get_rect().size[0]/2), (surf_altura/2) - (textoAjuda.get_rect().size[1]/2)))
         surf.blit(imagem_corredor, ((surf_largura/2) - (imagem_corredor.get_rect().size[0]/2), proporcao(10)))
         surf.blit(corredor, ((surf_largura/2) - (corredor.get_rect().size[0]/2), (imagem_corredor.get_rect().size[1]/2) - (corredor.get_rect().size[1]/2) + proporcao(10.4)))
         sprites.draw(surf)
@@ -240,7 +253,8 @@ while True:     #loop principal da interface
         if pygame.sprite.spritecollide(jetpack, coisas, False, pygame.sprite.collide_mask):
             game = 0
             v = v_inicial
-            t_obstaculo = 50
+            t_obstaculo = t_obstaculo_inicial
+            ajudax = ajudax_inicial
             
             score += [corrido]
             score.sort(reverse = 1)
