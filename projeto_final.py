@@ -10,7 +10,7 @@ import random
 pygame.init()    #inicia o pygame
 
 
-surf_altura = 400   #<-----------| altura da tela, recomendado: 900 |
+surf_altura = 800   #<-----------| altura da tela, recomendado: 900 |
 surf_largura = int(surf_altura * 1.5)
 
 def proporcao(a, b = 0):    #funcao que mantem a proporcao entre as sprites e o tamanho da tela
@@ -26,7 +26,7 @@ a_baixo = 0.12  #aceleracao vertical quando solta
 
 surf = pygame.display.set_mode([surf_largura, surf_altura]) #cria a janela
 
-font = pygame.font.SysFont(None, int(proporcao(6)))
+font = pygame.font.SysFont(None, int(proporcao(6)))     #cria a fonte para os textos
 
 coisa_imagens = []
 
