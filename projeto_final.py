@@ -6,11 +6,12 @@ Autores: Bruno Conte, Guilherme Aranha, Leonardo Alvarez
 import pygame    #importa todos os modulos que serao usados
 import sys
 import random
+import shelve
 
 pygame.init()    #inicia o pygame
 
 
-surf_altura = 800   #<-----------| altura da tela, recomendado: 900 |
+surf_altura = 900   #<-----------| altura da tela, recomendado: 900 |
 surf_largura = int(surf_altura * 1.5)
 
 def proporcao(a, b = 0):    #funcao que mantem a proporcao entre as sprites e o tamanho da tela
@@ -21,12 +22,16 @@ def proporcao(a, b = 0):    #funcao que mantem a proporcao entre as sprites e o 
     else:
         return (int(a * surf_altura * 0.8 / 100), int(b * surf_altura * 0.8 / 100))
 
-a_cima = -0.15  #aceleracao vertical quando aperta ESPAÇO
-a_baixo = 0.12  #aceleracao vertical quando solta
+a_cima = -0.10  #aceleracao vertical quando aperta ESPAÇO
+a_baixo = 0.08  #aceleracao vertical quando solta
 
-surf = pygame.display.set_mode([surf_largura, surf_altura]) #cria a janela
+surf = pygame.display.set_mode([surf_largura, surf_altura])     #cria a janela
 
-font = pygame.font.SysFont(None, int(proporcao(6)))     #cria a fonte para os textos
+font = pygame.font.SysFont(None, int(proporcao(6)))             #cria a fonte para os textos
+fontScoreboard = pygame.font.SysFont(None, int(proporcao(8)))
+fontScoreboard2 = pygame.font.SysFont(None, int(proporcao(2)))
+
+verde = (0, 170, 8)
 
 coisa_imagens = []
 
@@ -36,7 +41,27 @@ corrido = 0     #o caminho corrido comeca no 0
 v_inicial = 1
 v = v_inicial  #velocida dos obstaculos
 
-score = []
+arquivo_score = shelve.open('arquivo_score')
+try:
+    score = arquivo_score['score']
+except:
+    score = []
+arquivo_score.close()
+
+coisas_info = [
+        ('pedra', 20),
+        ('spike', 10),
+        ('barril vermelho', 15),
+        ('barril verde', 15),
+        ('caixa', 20),
+        ('disco', 20),
+        ('bloco', 25),
+        ('cactus', 15),
+        ('caixa 2', 20),
+        ('gelo', 25),
+        ('lapide', 10),
+        ('placa', 20)
+        ]
 
 try:
     imagem_menu = pygame.image.load('imagens/menu.png').convert()
@@ -48,6 +73,9 @@ try:
     imagem_scoreboardon = pygame.image.load('imagens/scoreboardon.png').convert()
     imagem_scoreboardon = pygame.transform.scale(imagem_scoreboardon, proporcao(60, 60))
     
+    imagem_corredor = pygame.image.load('imagens/corredor.png').convert()
+    imagem_corredor = pygame.transform.scale(imagem_corredor, proporcao(40, 40))
+    
     imagem_chao = pygame.image.load('imagens/chao.png').convert()
     imagem_chao = pygame.transform.scale(imagem_chao, proporcao(375, 30))
     imagem_teto = pygame.transform.rotate(imagem_chao, 180)
@@ -58,15 +86,11 @@ try:
     imagem_jetpack = pygame.image.load('imagens/jetpack.png').convert_alpha()
     imagem_jetpack = pygame.transform.scale(imagem_jetpack, proporcao(10, 10))
     
-    coisa_imagens.append(pygame.image.load('imagens/pedra.png').convert_alpha())
-    coisa_imagens[-1] = pygame.transform.scale(coisa_imagens[-1], proporcao(20, 20))
-    
-    coisa_imagens.append(pygame.image.load('imagens/laser.png').convert_alpha())
-    coisa_imagens[-1] = pygame.transform.scale(coisa_imagens[-1], proporcao(30, 30))
-    
-    coisa_imagens.append(pygame.image.load('imagens/spike.png').convert_alpha())
-    coisa_imagens[-1] = pygame.transform.scale(coisa_imagens[-1], proporcao(10, 10))
-    
+    for nome, tamanho in coisas_info:
+        imagem = pygame.image.load('imagens/' + nome + '.png').convert_alpha()
+        imagem = pygame.transform.scale(imagem, proporcao(tamanho, tamanho))
+        coisa_imagens.append(imagem)
+
 except pygame.error:
     print('Erro ao tentar ler uma imagem')
     sys.exit()
@@ -117,15 +141,21 @@ class Coisa(pygame.sprite.Sprite):      #sprite que serve como obstaculo
     def __init__(self, grupo):
         super().__init__(grupo)
         
-        self.image = pygame.transform.rotate(coisa_imagens[random.randint(0, len(coisa_imagens) -1)], random.randint(0,359))
+        preso = random.sample([0,0,0,0,0,0,0,0,1,2], k=1)[0]
+        
+        if preso == 0:
+            self.image = pygame.transform.rotate(coisa_imagens[random.randint(0, len(coisa_imagens) -1)], random.randint(0,359))
+        elif preso == 1:
+            self.image = coisa_imagens[random.randint(0, len(coisa_imagens) -1)]
+        else:
+            self.image = pygame.transform.rotate(coisa_imagens[random.randint(0, len(coisa_imagens) -1)], 180)
         self.rect = self.image.get_rect()
         self.mask = pygame.mask.from_surface(self.image)
         self.rect.left = surf_largura
-        if random.randint(0,4) == 0:
-            if random.randint(0,1) == 0:
-                self.rect.top = proporcao(0, 'borda')
-            else:
-                self.rect.bottom = proporcao(100, 'borda')
+        if preso == 2:
+            self.rect.top = proporcao(0, 'borda')
+        elif preso == 1:
+            self.rect.bottom = proporcao(100, 'borda')
         else:
             self.rect.y = random.randint(proporcao(0, 'borda'), proporcao(100, 'borda') - self.rect.height)
         
@@ -176,6 +206,8 @@ while True:     #loop principal da interface
                 jetpack.a = a_cima                          #acelera para cima 
             if event.key == pygame.K_RETURN and game == 0:
                 game = 1                                    #inicia o jogo a partir do menu
+            if event.key == pygame.K_e and game == 0:
+                score = []
                 
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_SPACE:
@@ -185,20 +217,21 @@ while True:     #loop principal da interface
         timer += 1
         if timer >= t_obstaculo: #Timer para criar obstaculos
             timer = 0
-            t_obstaculo = random.randint(20, 100)
+            t_obstaculo = random.randint(10, 40 + int(400/((v-0.9)*100)))   #cria aleatoriamente o tempo ate o proximo obstaculo aparecer, esse valor diminui conforme a velocidade almenta
             coisa = Coisa(sprites)
             coisas.add(coisa)
             
-        v += 0.001   #aumenta a velocidade dos obstaculos constantemente
+        v += 0.0001   #aumenta a velocidade dos obstaculos constantemente
         corrido += v * 0.05
-        corredor = font.render(str(int(corrido)) + ' metros', True, (200, 200, 0))     #atualiza o contador da distancia percorrida
+        corredor = font.render(str(int(corrido)) + ' metros', True, verde)     #atualiza o contador da distancia percorrida
             
         surf.fill((255, 255, 255)) # preenche a tela
         #cores variam de 0 a 255 > 0 = preto
         fundos.draw(surf)
+        surf.blit(imagem_corredor, ((surf_largura/2) - (imagem_corredor.get_rect().size[0]/2), proporcao(10)))
+        surf.blit(corredor, ((surf_largura/2) - (corredor.get_rect().size[0]/2), (imagem_corredor.get_rect().size[1]/2) - (corredor.get_rect().size[1]/2) + proporcao(10.4)))
         sprites.draw(surf)
         paredes.draw(surf)
-        surf.blit(corredor, (10, 10))
         
         sprites.update()
         fundos.update()
@@ -208,10 +241,14 @@ while True:     #loop principal da interface
             game = 0
             v = v_inicial
             t_obstaculo = 50
+            
             score += [corrido]
             score.sort(reverse = 1)
             score = score[:5]
-            print(score)
+            arquivo_score = shelve.open('arquivo_score')
+            arquivo_score['score'] = score
+            arquivo_score.close()
+            
             corrido = 0
             for i in coisas:
                 i.kill()
@@ -227,10 +264,18 @@ while True:     #loop principal da interface
             surf.blit(imagem_scoreboardoff, ((surf_largura/2) - (imagem_scoreboardoff.get_rect().size[0]/2), (surf_altura/2) - (imagem_scoreboardoff.get_rect().size[1]/2) + proporcao(20))) 
         else:
             surf.blit(imagem_scoreboardon, ((surf_largura/2) - (imagem_scoreboardoff.get_rect().size[0]/2), (surf_altura/2) - (imagem_scoreboardoff.get_rect().size[1]/2) + proporcao(20))) 
+            textoScoreboard = fontScoreboard.render('- Scoreboard -', True, verde)
+            surf.blit(textoScoreboard, ((surf_largura/2) - (textoScoreboard.get_rect().size[0]/2), (surf_altura/2) - (textoScoreboard.get_rect().size[1]/2) + proporcao(4.5)))
+            textoScoreboard2 = fontScoreboard2.render('Aperte [E] para apagar os scores', True, verde)
+            surf.blit(textoScoreboard2, ((surf_largura/2) - (textoScoreboard2.get_rect().size[0]/2), (surf_altura/2) - (textoScoreboard2.get_rect().size[1]/2) + proporcao(40)))
+            
             n = 0
             for i in score:
-                texto = font.render(str(int(i)) + ' metros', True, (0, 170, 8))
-                surf.blit(texto, ((surf_largura/2) - (texto.get_rect().size[0]/2), (surf_altura/2) - (texto.get_rect().size[1]/2) + proporcao(6) + (proporcao(7)*n)))
+                if n == 0:
+                    texto = font.render('> ' + str(int(i)) + ' metros <', True, verde)
+                else:
+                    texto = font.render(str(int(i)) + ' metros', True, verde)
+                surf.blit(texto, ((surf_largura/2) - (texto.get_rect().size[0]/2), (surf_altura/2) - (texto.get_rect().size[1]/2) + proporcao(12) + (proporcao(6)*n)))
                 n += 1
     
     pygame.display.flip() # faz a atualizacao da tela
