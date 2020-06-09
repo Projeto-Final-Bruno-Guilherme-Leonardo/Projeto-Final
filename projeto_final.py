@@ -78,16 +78,16 @@ try:
     imagem_menu = pygame.image.load('imagens/menu.png').convert()
     imagem_menu = pygame.transform.scale(imagem_menu, (surf_largura, surf_altura))
     
-    imagem_scoreboardoff = pygame.image.load('imagens/scoreboardoff.png').convert()
+    imagem_scoreboardoff = pygame.image.load('imagens/scoreboardoff.png').convert_alpha()
     imagem_scoreboardoff = pygame.transform.scale(imagem_scoreboardoff, proporcao(60, 60))
     
-    imagem_scoreboardon = pygame.image.load('imagens/scoreboardon.png').convert()
+    imagem_scoreboardon = pygame.image.load('imagens/scoreboardon.png').convert_alpha()
     imagem_scoreboardon = pygame.transform.scale(imagem_scoreboardon, proporcao(60, 60))
     
-    imagem_corredor = pygame.image.load('imagens/corredor.png').convert()
+    imagem_corredor = pygame.image.load('imagens/corredor.png').convert_alpha()
     imagem_corredor = pygame.transform.scale(imagem_corredor, proporcao(40, 40))
     
-    imagem_ajuda = pygame.image.load('imagens/ajuda.png').convert()
+    imagem_ajuda = pygame.image.load('imagens/ajuda.png').convert_alpha()
     imagem_ajuda = pygame.transform.scale(imagem_ajuda, proporcao(100, 100))
     
     imagem_chao = pygame.image.load('imagens/chao.png').convert()
