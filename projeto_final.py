@@ -3,18 +3,18 @@ Jogo Jetpack
 Autores: Bruno Conte, Guilherme Aranha, Leonardo Alvarez
 """
 
-import pygame    #importa todos os modulos que serao usados
+import pygame    # Importa todos os módulos que serão usados
 import sys
 import random
 import shelve
 
-pygame.init()    #inicia o pygame
+pygame.init()    # Inicia o pygame
 
 
-surf_altura = 1000   #<-----------| altura da tela, recomendado: 900 |
+surf_altura = 800   #<-----------| Altura da tela, recomendado: 900 |
 surf_largura = int(surf_altura * 1.5)
 
-def proporcao(a, b = 0):    #funcao que mantem a proporcao entre as sprites e o tamanho da tela
+def proporcao(a, b = 0):    # Função que mantém a proporção entre as sprites e o tamanho da tela
     if b == 0:
         return a * surf_altura / 100
     elif b == 'borda':
@@ -22,12 +22,12 @@ def proporcao(a, b = 0):    #funcao que mantem a proporcao entre as sprites e o 
     else:
         return (int(a * surf_altura * 0.8 / 100), int(b * surf_altura * 0.8 / 100))
 
-a_cima = -0.10  #aceleracao vertical quando aperta ESPAÇO
-a_baixo = 0.08  #aceleracao vertical quando solta
+a_cima = -0.10  # Aceleração vertical quando aperta ESPAÇO
+a_baixo = 0.08  # Aceleração vertical quando solta ESPAÇO
 
-surf = pygame.display.set_mode([surf_largura, surf_altura])     #cria a janela
+surf = pygame.display.set_mode([surf_largura, surf_altura])     # Cria a janela do jogo
 
-font = pygame.font.SysFont(None, int(proporcao(6)))             #cria a fonte para os textos
+font = pygame.font.SysFont(None, int(proporcao(6)))             # Cria a fonte para os textos
 fontScoreboard = pygame.font.SysFont(None, int(proporcao(8)))
 fontScoreboard2 = pygame.font.SysFont(None, int(proporcao(2)))
 fontAjuda = pygame.font.SysFont(None, int(proporcao(5)))
@@ -36,11 +36,11 @@ verde = (0, 170, 8)
 
 coisa_imagens = []
 
-game = 0    #o jogo começa desligado, ou seja, no menu
-corrido = 0     #o caminho corrido comeca no 0
+game = 0    # O jogo começa desligado, ou seja, no MENU
+corrido = 0     # O caminho corrido começa em 0
 
 v_inicial = 1
-v = v_inicial  #velocida dos obstaculos
+v = v_inicial  # Velocidade dos obstáculos
 
 ajudax_inicial = proporcao(150)
 ajudax = ajudax_inicial
@@ -52,11 +52,11 @@ except:
     score = []
 arquivo_score.close()
 
-clock = pygame.time.Clock()     #cria o FPS do jogo
+clock = pygame.time.Clock()     # Cria o FPS do jogo
 FPS = 60
 
-timer = 0   #cria o timer para criar os obstaculos
-t_obstaculo_inicial = 100   #tempo ate aparecer o primeiro obstaculo
+timer = 0   # Cria o timer para criar os obstáculos constantemente
+t_obstaculo_inicial = 100   # Tempo até aparecer o primeiro obstáculo
 t_obstaculo = t_obstaculo_inicial
 
 coisas_info = [
@@ -78,16 +78,16 @@ try:
     imagem_menu = pygame.image.load('imagens/menu.png').convert()
     imagem_menu = pygame.transform.scale(imagem_menu, (surf_largura, surf_altura))
     
-    imagem_scoreboardoff = pygame.image.load('imagens/scoreboardoff.png').convert_alpha()
+    imagem_scoreboardoff = pygame.image.load('imagens/scoreboardoff.png').convert()
     imagem_scoreboardoff = pygame.transform.scale(imagem_scoreboardoff, proporcao(60, 60))
     
-    imagem_scoreboardon = pygame.image.load('imagens/scoreboardon.png').convert_alpha()
+    imagem_scoreboardon = pygame.image.load('imagens/scoreboardon.png').convert()
     imagem_scoreboardon = pygame.transform.scale(imagem_scoreboardon, proporcao(60, 60))
     
-    imagem_corredor = pygame.image.load('imagens/corredor.png').convert_alpha()
+    imagem_corredor = pygame.image.load('imagens/corredor.png').convert()
     imagem_corredor = pygame.transform.scale(imagem_corredor, proporcao(40, 40))
     
-    imagem_ajuda = pygame.image.load('imagens/ajuda.png').convert_alpha()
+    imagem_ajuda = pygame.image.load('imagens/ajuda.png').convert()
     imagem_ajuda = pygame.transform.scale(imagem_ajuda, proporcao(100, 100))
     
     imagem_chao = pygame.image.load('imagens/chao.png').convert()
@@ -109,7 +109,7 @@ except pygame.error:
     print('Erro ao tentar ler uma imagem')
     sys.exit()
 
-class Cenario(pygame.sprite.Sprite):    #sprite que serve como cenario
+class Cenario(pygame.sprite.Sprite):    # Sprite que serve como cenário
     def __init__(self, grupo, imagem, paralaxe = 0):
         super().__init__(grupo)
         
@@ -123,7 +123,7 @@ class Cenario(pygame.sprite.Sprite):    #sprite que serve como cenario
             self.rect.centerx = surf_largura
             
 
-class Jetpack(pygame.sprite.Sprite):    #sprite que mostra o player
+class Jetpack(pygame.sprite.Sprite):    # Sprite que mostra o player
     def __init__(self, grupo):
         super().__init__(grupo)
         
@@ -132,8 +132,8 @@ class Jetpack(pygame.sprite.Sprite):    #sprite que mostra o player
         self.mask = pygame.mask.from_surface(self.image)
         self.rect.left = proporcao(10)
         self.rect.bottom = proporcao(100, 'borda')
-        self.speed = 0  #velocidade vertical da jetpack
-        self.a = 0  #aceleracao vertical da jetpack
+        self.speed = 0  # Velocidade vertical do player
+        self.a = 0  # Aceleração vertical do player
         
     def update(self):
         self.speed += self.a
@@ -147,11 +147,11 @@ class Jetpack(pygame.sprite.Sprite):    #sprite que mostra o player
     
     def reset(self):
         self.rect.bottom = proporcao(100, 'borda')
-        self.speed = 0  #velocidade vertical da jetpack
-        self.a = 0  #aceleracao
+        self.speed = 0  # Velocidade vertical do player
+        self.a = 0  # Aceleração vertical do player
         
             
-class Coisa(pygame.sprite.Sprite):      #sprite que serve como obstaculo
+class Coisa(pygame.sprite.Sprite):      # Sprite que serve como obstáculo
     def __init__(self, grupo):
         super().__init__(grupo)
         
@@ -181,14 +181,14 @@ class Coisa(pygame.sprite.Sprite):      #sprite que serve como obstaculo
         
 
 
-sprites = pygame.sprite.Group()     #cria os grupos de sprites
+sprites = pygame.sprite.Group()     # Cria os grupos de sprites
 coisas = pygame.sprite.Group()
 paredes = pygame.sprite.Group()
 fundos = pygame.sprite.Group()
 
-jetpack = Jetpack(sprites)      #cria a sprite do player
+jetpack = Jetpack(sprites)      # Cria a sprite do player
 
-teto = Cenario(paredes, imagem_teto)    #cria as spritse do cenario
+teto = Cenario(paredes, imagem_teto)    # Cria as sprites do cenário
 teto.rect.left = proporcao(0)
 teto.rect.bottom = proporcao(0, 'borda')
 chao = Cenario(paredes, imagem_chao)
@@ -201,40 +201,40 @@ fundo.rect.centery = proporcao(50, 'borda')
 
 
 
-while True:     #loop principal da interface
-    clock.tick(FPS)     #garante o FPS predeterminado
+while True:     # Loop principal da interface
+    clock.tick(FPS)     # Garante o FPS predeterminado do jogo
     
-    for event in pygame.event.get():    #detecta os eventos do usuario
+    for event in pygame.event.get():    # Detecta os eventos do usuário
         if event.type == pygame.QUIT:
-            pygame.quit()               #fecha o pygame
-            sys.exit()                   #fecha o sistema
+            pygame.quit()               # Fecha o pygame
+            sys.exit()                   # Fecha o sistema
             
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
-                jetpack.a = a_cima                          #acelera para cima 
+                jetpack.a = a_cima                          # Acelera para cima 
             if event.key == pygame.K_RETURN and game == 0:
-                game = 1                                    #inicia o jogo a partir do menu
+                game = 1                                    # Inicia o jogo a partir do MENU
             if event.key == pygame.K_e and game == 0:
                 score = []
                 
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_SPACE:
-                jetpack.a = a_baixo                         #acelera para baixo
+                jetpack.a = a_baixo                         # Acelera para baixo
     
-    if game:    #se o jogo estiver ligado:  
+    if game:    # Se o jogo estiver ligado:  
         timer += 1
-        if timer >= t_obstaculo: #Timer para criar obstaculos
+        if timer >= t_obstaculo: # Timer para criar obstáculos
             timer = 0
-            t_obstaculo = random.randint(10, 40 + int(400/((v-0.9)*100)))   #cria aleatoriamente o tempo ate o proximo obstaculo aparecer, esse valor diminui conforme a velocidade almenta
+            t_obstaculo = random.randint(10, 40 + int(400/((v-0.9)*100)))   # Cria aleatoriamente o tempo até o próximo obstáculo aparecer, esse valor diminui conforme a velocidade aumenta
             coisa = Coisa(sprites)
             coisas.add(coisa)
             
-        v += 0.0001   #aumenta a velocidade dos obstaculos constantemente
+        v += 0.0001   # Aumenta a velocidade dos obstáculos constantemente
         corrido += v * 0.05
-        corredor = font.render(str(int(corrido)) + ' metros', True, verde)     #atualiza o contador da distancia percorrida
+        corredor = font.render(str(int(corrido)) + ' metros', True, verde)     # Atualiza o contador da distância percorrida
             
-        surf.fill((255, 255, 255)) # preenche a tela
-        #cores variam de 0 a 255 > 0 = preto
+        surf.fill((255, 255, 255)) # Preenche a tela
+        # Cores variam de 0 a 255 > 0 = preto
         fundos.draw(surf)
         if ajudax > 0:
             surf.blit(imagem_ajuda, (ajudax - imagem_ajuda.get_rect().size[0], (surf_altura/2) - (imagem_ajuda.get_rect().size[1]/2)))
@@ -269,11 +269,11 @@ while True:     #loop principal da interface
             for i in paredes:
                 i.rect.left = 0
             jetpack.reset()
-            surf.fill((55, 55, 55)) # preenche a tela
+            surf.fill((55, 55, 55)) # Preenche a tela
         
-    else:   #se o jogo estiver desligado, ou seja, no menu
-#        score = [412, 1, 44, 2222, 2]
-        surf.blit(imagem_menu, (0, 0))      #apresenta o Menu
+    else:   # Se o jogo estiver desligado, ou seja, no MENU
+#        Score = [412, 1, 44, 2222, 2]
+        surf.blit(imagem_menu, (0, 0))      # Apresenta o MENU
         if len(score) == 0:
             surf.blit(imagem_scoreboardoff, ((surf_largura/2) - (imagem_scoreboardoff.get_rect().size[0]/2), (surf_altura/2) - (imagem_scoreboardoff.get_rect().size[1]/2) + proporcao(20))) 
         else:
@@ -292,7 +292,7 @@ while True:     #loop principal da interface
                 surf.blit(texto, ((surf_largura/2) - (texto.get_rect().size[0]/2), (surf_altura/2) - (texto.get_rect().size[1]/2) + proporcao(12) + (proporcao(6)*n)))
                 n += 1
     
-    pygame.display.flip() # faz a atualizacao da tela
+    pygame.display.flip() # Saz a atualização da tela
 
 
 
