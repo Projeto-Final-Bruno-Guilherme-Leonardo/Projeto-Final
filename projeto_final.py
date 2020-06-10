@@ -59,8 +59,12 @@ timer = 0   #cria o timer para criar os obstaculos
 t_obstaculo_inicial = 100   #tempo ate aparecer o primeiro obstaculo
 t_obstaculo = t_obstaculo_inicial
 
-coisas_info = [
-        ('pedra', 20),
+pygame.mixer.music.load('mixer/battleship.ogg')     #load a musica tema
+pygame.mixer.music.set_volume(0.2)                  #abaixa o volume
+pygame.mixer.music.play(-1)                         #começa a tocar a musica ciclicamente
+
+coisas_info = [                                     #informações sobre como fazer o load das imagens dos obstaculos
+        ('pedra', 20),                              #(nome do arquivo, dimensao da imagem)
         ('spike', 10),
         ('barril vermelho', 15),
         ('barril verde', 15),
@@ -74,7 +78,7 @@ coisas_info = [
         ('placa', 20)
         ]
 
-try:
+try:        #load as imagens 
     imagem_menu = pygame.image.load('imagens/menu.png').convert()
     imagem_menu = pygame.transform.scale(imagem_menu, (surf_largura, surf_altura))
     
@@ -100,16 +104,17 @@ try:
     imagem_jetpack = pygame.image.load('imagens/jetpack.png').convert_alpha()
     imagem_jetpack = pygame.transform.scale(imagem_jetpack, proporcao(10, 10))
     
-    for nome, tamanho in coisas_info:
+    for nome, tamanho in coisas_info:       #load as imagens dos obstaculos
         imagem = pygame.image.load('imagens/' + nome + '.png').convert_alpha()
         imagem = pygame.transform.scale(imagem, proporcao(tamanho, tamanho))
         coisa_imagens.append(imagem)
 
-except pygame.error:
+except pygame.error:        #caso algum load falhe, print erro
     print('Erro ao tentar ler uma imagem')
     sys.exit()
 
-class Cenario(pygame.sprite.Sprite):    #sprite que serve como cenario
+class Cenario(pygame.sprite.Sprite):
+    '''Sprites que são usadas apenas para o cenario, elas nao interagem com o player'''
     def __init__(self, grupo, imagem, paralaxe = 0):
         super().__init__(grupo)
         
@@ -117,13 +122,14 @@ class Cenario(pygame.sprite.Sprite):    #sprite que serve como cenario
         self.rect = self.image.get_rect()
         self.paralaxe = paralaxe
     
-    def update(self):
-        self.rect.x -= int(proporcao(v)) - (self.paralaxe * (2/3) * int(proporcao(v)))
+    def update(self):       #anda o cenario para a esquerda
+        self.rect.x -= int(proporcao(v)) - (self.paralaxe * (2/3) * int(proporcao(v)))  #se o cenario tiver paralaxe, ele anda mais devagar que o resto dos cenarios
         if self.rect.centerx < 0:
             self.rect.centerx = surf_largura
             
 
-class Jetpack(pygame.sprite.Sprite):    #sprite que mostra o player
+class Jetpack(pygame.sprite.Sprite):
+    '''Sprite do player'''
     def __init__(self, grupo):
         super().__init__(grupo)
         
@@ -132,48 +138,49 @@ class Jetpack(pygame.sprite.Sprite):    #sprite que mostra o player
         self.mask = pygame.mask.from_surface(self.image)
         self.rect.left = proporcao(10)
         self.rect.bottom = proporcao(100, 'borda')
-        self.speed = 0  #velocidade vertical da jetpack
-        self.a = 0  #aceleracao vertical da jetpack
+        self.speed = 0                                      #velocidade vertical da jetpack
+        self.a = 0                                          #aceleracao vertical da jetpack
         
     def update(self):
         self.speed += self.a
         self.rect.y += proporcao(self.speed)
-        if self.rect.top + (1 * self.speed) < proporcao(0, 'borda'):
+        if self.rect.top + (1 * self.speed) < proporcao(0, 'borda'):        #nao permite que o player sair para cima da tela
             self.rect.top = proporcao(0, 'borda')
             self.speed = 0
-        if self.rect.bottom + (1 * self.speed) > proporcao(100, 'borda'):
+        if self.rect.bottom + (1 * self.speed) > proporcao(100, 'borda'):   #nao permite que o player sair para baixo da tela
             self.rect.bottom = proporcao(100, 'borda')
             self.speed = 0
     
-    def reset(self):
+    def reset(self):                                                        #reseta o player para recomeçar o jogo
         self.rect.bottom = proporcao(100, 'borda')
         self.speed = 0  #velocidade vertical da jetpack
         self.a = 0  #aceleracao
         
             
-class Coisa(pygame.sprite.Sprite):      #sprite que serve como obstaculo
+class Coisa(pygame.sprite.Sprite):
+    '''Sprite dos obstaculos, o player deve desviar delas'''
     def __init__(self, grupo):
         super().__init__(grupo)
         
-        preso = random.sample([0,0,0,0,0,0,0,0,1,2], k=1)[0]
+        preso = random.sample([0,0,0,0,0,0,0,0,1,2], k=1)[0]            #randomiza a chance de ser um obstaculo no chao, no teto ou voando
         
-        if preso == 0:
+        if preso == 0:      #obstaculo voando tem uma imagem em qualquer orientação
             self.image = pygame.transform.rotate(coisa_imagens[random.randint(0, len(coisa_imagens) -1)], random.randint(0,359))
-        elif preso == 1:
+        elif preso == 1:    #obstaculo no chao estao retos para cima
             self.image = coisa_imagens[random.randint(0, len(coisa_imagens) -1)]
-        else:
+        else:               #obstaculo no teto estao de ponta cabeca
             self.image = pygame.transform.rotate(coisa_imagens[random.randint(0, len(coisa_imagens) -1)], 180)
         self.rect = self.image.get_rect()
         self.mask = pygame.mask.from_surface(self.image)
         self.rect.left = surf_largura
-        if preso == 2:
+        if preso == 2:      #obstaculo no chao é posicionado no chao
             self.rect.top = proporcao(0, 'borda')
-        elif preso == 1:
+        elif preso == 1:    #obstaculo no teto é posicionado no teto
             self.rect.bottom = proporcao(100, 'borda')
-        else:
+        else:               #obstaculo voando tem uma posicao aleatoria
             self.rect.y = random.randint(proporcao(0, 'borda'), proporcao(100, 'borda') - self.rect.height)
         
-    def update(self):
+    def update(self):       #anda o obstaculo para a esquerda
         self.rect.x -= int(proporcao(v))
         if self.rect.right < 0:
             self.kill()
