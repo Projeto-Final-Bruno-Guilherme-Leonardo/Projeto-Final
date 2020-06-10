@@ -125,7 +125,7 @@ class Cenario(pygame.sprite.Sprite):
         self.paralaxe = paralaxe
     
     def update(self):       # Anda o cenário para a esquerda
-        self.rect.x -= int(proporcao(v)) - (self.paralaxe * (2/3) * int(proporcao(v)))  #se o cenario tiver paralaxe, ele anda mais devagar que o resto dos cenarios
+        self.rect.x -= int(proporcao(v)) - (self.paralaxe * (2/3) * int(proporcao(v)))  # Se o cenario tiver paralaxe, ele anda mais devagar que o resto dos cenarios
         if self.rect.centerx < 0:       # Os cenários apresentam um fundo sem fim, sempre andando para a esquerda
             self.rect.centerx = surf_largura
             
