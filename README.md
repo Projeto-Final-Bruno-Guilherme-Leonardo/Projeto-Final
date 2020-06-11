@@ -21,8 +21,8 @@
   * No tunel: [ESPACO] para fazer a personagem voar. (soltar o [ESPACO] faz com que a personagem caia)
 * O objetivo do jogo eh percorrer a maior distancia dentro do tunel sem ser acertado por um obst‡culo.
 * Foram usados como fonte de pesquisa para a criacao do codigo apenas os dois tutoriais fornecidos pelo professor Luciano Soares sobre pygame e a documentacao do pygame em https://www.pygame.org
-* Todas as imagens foram criadas a partir dos TileSets gratuitos do site https://www.gameart2d.com, com excecao do personagem do jogador, que foi tirado do site https://icons8.com. As vers›es originais de todas as imagens tiradas desses dois sites est‹o na pasta imagens\ originais/. Usamos o Photoshop para adaptarmos a maioria das imagens usadas.
+* Todas as imagens foram criadas a partir dos TileSets gratuitos do site https://www.gameart2d.com, com excecao do personagem do jogador, que foi tirado do site https://icons8.com. As versoes originais de todas as imagens tiradas desses dois sites estao na pasta imagens\ originais/. Usamos o Photoshop para adaptarmos a maioria das imagens usadas.
 * A mœsica tema do jogo foi tirada do site https://patrickdearteaga.com/royalty-free-music/, enquanto o som da batida foi criado artesanalmente.
-* Como recurso complementar, implementamos o armazenamento dos scores em um arquivo separado do c—digo principal chamado score_arquivo.db, com o uso do m—dulo Shelve, para que os scores n‹o fossem reiniciados cada vez que o jogo fosse aberto.  
+* Como recurso complementar, implementamos o armazenamento dos scores em um arquivo separado do codigo principal chamado score_arquivo.db, com o uso do modulo Shelve, para que os scores n‹o fossem reiniciados cada vez que o jogo fosse aberto.  
 
 
