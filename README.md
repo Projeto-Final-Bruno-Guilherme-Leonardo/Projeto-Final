@@ -18,9 +18,9 @@
 * O jogo eh composto por duas telas: o menu e o tunel.
 * Os controles disponíveis são:
   * No menu: [ENTER] para comecar o jogo, [E] para apagar os scores gravados.
-  * No tunel: [ESPAÇO] para fazer a personagem voar. (soltar o [ESPAÇO] faz com que a personagem caia)
+  * No tunel: [ESPACO] para fazer a personagem voar. (soltar o [ESPACO] faz com que a personagem caia)
 * O objetivo do jogo eh percorrer a maior distancia dentro do tunel sem ser acertado por um obstáculo.
-* Foram usados como fonte de pesquisa para a criacao do codigo apenas os dois tutoriais fornecidos pelo professor Luciano Soares sobre pygame e a documentação do pygame em https://www.pygame.org
+* Foram usados como fonte de pesquisa para a criacao do codigo apenas os dois tutoriais fornecidos pelo professor Luciano Soares sobre pygame e a documentacao do pygame em https://www.pygame.org
 * Todas as imagens foram criadas a partir dos TileSets gratuitos do site https://www.gameart2d.com, com excecao do personagem do jogador, que foi tirado do site https://icons8.com. As versões originais de todas as imagens tiradas desses dois sites estão na pasta imagens\ originais/. Usamos o Photoshop para adaptarmos a maioria das imagens usadas.
 * A música tema do jogo foi tirada do site https://patrickdearteaga.com/royalty-free-music/, enquanto o som da batida foi criado artesanalmente.
 * Como recurso complementar, implementamos o armazenamento dos scores em um arquivo separado do código principal chamado score_arquivo.db, com o uso do módulo Shelve, para que os scores não fossem reiniciados cada vez que o jogo fosse aberto.  
