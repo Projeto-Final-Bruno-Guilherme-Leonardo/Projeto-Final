@@ -11,6 +11,7 @@ import random
 import shelve
 
 pygame.init()    # Inicia o pygame
+pygame.display.set_caption('Into The Tunnel')   #muda o nome da janela
 
 from config import surf_altura, surf_largura, proporcao, a_cima, a_baixo, surf, font, fontScoreboard, fontScoreboard2, fontAjuda, verde, game, corrido, v_inicial, v, ajudax_inicial, ajudax, score, clock, FPS, timer, t_obstaculo_inicial, t_obstaculo             #importa as configurações
 from load_imagens import imagens                    #importa as imagens
